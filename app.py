@@ -2,23 +2,9 @@ from time import sleep
 from pdf2docx import Converter
 from pdf2docx import parse
 from flet import (
-    app,
-    Page,
-    Row,
-    TextField,
-    icons,
-    ElevatedButton,
-    FilePickerResultEvent,
-    FilePicker,
-    ProgressBar,
-    Text,
-    MainAxisAlignment,
-    Column,
-    AppBar,
-    colors,
-    View
+    app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
+    ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View
 )
-
 
 def main(page: Page):
     page.title = "PDF"
@@ -27,7 +13,7 @@ def main(page: Page):
     page.window_height = 280
     page.window_resizable= False
 
-    # INICIO**************************************************************************************************
+    # INICIO---------------------------------------------------------------------------------------------
     appbar_init = AppBar(
         title=Text("Herramientas PDF"),
         bgcolor=colors.SURFACE_VARIANT,
@@ -42,8 +28,8 @@ def main(page: Page):
 
     btn_init_edit= ElevatedButton("Editar PDF", width=200, height=50)
 
-    # FIN INICIO---------------------------------------------------------------------------------------------  
-    # CONVERSOR***********************************************************************************************
+    # FIN INICIO***********************************************************************************************  
+    # CONVERSOR---------------------------------------------------------------------------------------------
 
     # FUNCIONES DE EVENTO FilePickerResultEvent
     def pick_files_result(e: FilePickerResultEvent):
@@ -146,16 +132,15 @@ def main(page: Page):
         "Convertir", icon=icons.BUILD_CIRCLE_SHARP, on_click=verify_path
     )
 
-    # FINAL CONVERSOR---------------------------------------------------------------------------------------
-    # SEPARADOR*************************************************************************************************
+    # FINAL CONVERSOR*********************************************************************************
+    # SEPARADOR---------------------------------------------------------------------------------------
 
-    # FINAL SEPARADOR********************************************************************************************
-    # UNION****************************************************************************************************
+    # FINAL SEPARADOR***************************************************************************************
+    # UNION---------------------------------------------------------------------------------------
 
     # FINAL UNION***********************************************************************************************
 
     # Pagina y Vistas******************************************************************************************
-    # Pagina y Componentes
     
     def cambio_ruta(e):
         page.views.clear()
