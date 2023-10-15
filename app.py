@@ -12,15 +12,12 @@ from flet import (
     FilePicker,
     ProgressBar,
     Text,
-    CrossAxisAlignment,
     MainAxisAlignment,
     Column,
     AppBar,
     colors,
-    View,
-    Container
+    View
 )
-import converter
 
 
 def main(page: Page):
