@@ -3,14 +3,24 @@ from pdf2docx import Converter
 from pdf2docx import parse
 from flet import (
     app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
-    ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View
+    ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio
 )
+
+class appbar_edit:
+    def __init__(self) -> None:
+        txt_variable = txt_variable
+        var = AppBar(
+            title=Text(txt_variable),
+            bgcolor=colors.SURFACE_VARIANT,
+            center_title=True
+        )
+        return var
 
 def main(page: Page):
     page.title = "PDF"
     #page.vertical_alignment = "center"
     page.window_width = 550
-    page.window_height = 280
+    page.window_height = 300
     page.window_resizable= False
 
     # INICIO---------------------------------------------------------------------------------------------
@@ -24,11 +34,12 @@ def main(page: Page):
 
     btn_init_join= ElevatedButton("Unir PDF", width=200, height=50)
 
-    btn_init_separator= ElevatedButton("Separar PDF", width=200, height=50)
+    btn_init_separate= ElevatedButton("Separar PDF", width=200, height=50, on_click= lambda _:page.go('/separate'))
 
     btn_init_edit= ElevatedButton("Editar PDF", width=200, height=50)
 
     # FIN INICIO***********************************************************************************************  
+    
     # CONVERSOR---------------------------------------------------------------------------------------------
 
     # FUNCIONES DE EVENTO FilePickerResultEvent
@@ -117,7 +128,7 @@ def main(page: Page):
         icon=icons.ARROW_CIRCLE_UP_OUTLINED,
         on_click=lambda _: pick_files_dialog.pick_files(
             allow_multiple=True, allowed_extensions=["pdf"]
-        ),
+        )
     )
 
     btn_converter_down = ElevatedButton(
@@ -125,7 +136,7 @@ def main(page: Page):
         icon=icons.ARROW_CIRCLE_DOWN,
         on_click=lambda _: save_file_dialog.save_file(
             file_type="any", allowed_extensions=["docx"]
-        ),
+        )
     )
 
     btn_converter = ElevatedButton(
@@ -135,6 +146,37 @@ def main(page: Page):
     # FINAL CONVERSOR*********************************************************************************
     # SEPARADOR---------------------------------------------------------------------------------------
 
+    # Componentes
+    appbar_separate = AppBar(
+        title=Text("Conversor PDF > DOCX"),
+        bgcolor=colors.SURFACE_VARIANT,
+        center_title=True
+    )
+
+    text_separate_page = TextField(text_align="left", read_only=True, text_size=14, width=220)
+
+    btn_separate = ElevatedButton(
+        "Separar", icon=icons.BUILD_CIRCLE_SHARP,
+        disabled= True
+    )
+
+    radius_separate_page = RadioGroup(content= Column([Radio(value= 'all', label= 'Todo'),
+                                                        Radio(value= 'parts', label= 'Partes')]),
+                                                        on_change= lambda _:change_radius(),
+                                                        disabled= True)
+
+    #Funciones
+
+    def change_radius():
+        if radius_separate_page.value == 'all':
+            text_separate_page.read_only = True
+            btn_separate.disabled = False
+        if radius_separate_page.value == 'parts':
+            text_separate_page.read_only = False
+            btn_separate.disabled = False
+
+        page.update()
+    
     # FINAL SEPARADOR***************************************************************************************
     # UNION---------------------------------------------------------------------------------------
 
@@ -152,7 +194,7 @@ def main(page: Page):
                     appbar_init,
                     Column([
                         Row([btn_init_converter, btn_init_edit], alignment=MainAxisAlignment.SPACE_EVENLY),
-                        Row([btn_init_join, btn_init_separator], alignment=MainAxisAlignment.SPACE_EVENLY)
+                        Row([btn_init_join, btn_init_separate], alignment=MainAxisAlignment.SPACE_EVENLY)
                     ], spacing=35)
                 ]        
             )           
@@ -167,10 +209,25 @@ def main(page: Page):
                         Column([
                             Row([text_converter_up, btn_converter_up], alignment= 'right'),
                             Row([text_converter_down, btn_converter_down], alignment= 'right'),
-                            Row([btn_converter],alignment= "right")
+                            Row([btn_converter], alignment= "right")
                         ])
                     ]          
                 )      
+            )
+        
+        if page.route == '/separate':
+            page.views.append(
+                View(
+                    '/separate',
+                    [
+                        appbar_separate,
+                        Column([
+                            Row([text_converter_up, btn_converter_up], alignment= 'right'),
+                            Row([text_converter_down, btn_converter_down], alignment= 'right'),
+                            Row([radius_separate_page,text_separate_page , btn_separate], alignment= "right")
+                        ])
+                    ]
+                )
             )
         
         page.update()

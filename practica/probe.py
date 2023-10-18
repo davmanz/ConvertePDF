@@ -1,16 +1,19 @@
-import fitz  # Importa la librería PyMuPDF
+def examinar_texto(texto):
+    resultado = []
+    temp = []
+    i = 0
 
-pdf_file = "book/book.pdf"
-doc = fitz.open(pdf_file)
+    while i < len(texto):
+        char = texto[i]
 
-# Páginas que deseas separar (por ejemplo, 1, 2 y 3)
-pages_to_extract = [0, 1, 2]
+        if char.isdigit():
+            temp.append(char)
+        elif char == ',':
+            if temp:
+                resultado.append(temp)
+                temp = []
+        i += 1
 
-for page_num in pages_to_extract:
-    page = doc[page_num]
-    new_doc = fitz.open()
-    new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
-    new_doc.save(f"pagina_{page_num + 1}.pdf")
-    new_doc.close()
-
-doc.close()
+texto = '2 , 8 , 9, 5-6, , 8, 9+3, 16'
+resultado = examinar_texto(texto)
+print(resultado)
