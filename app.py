@@ -1,6 +1,5 @@
 from time import sleep
 from pdf2docx import Converter
-from pdf2docx import parse
 from flet import (
     app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
     ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio

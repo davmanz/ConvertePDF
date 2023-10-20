@@ -1,11 +1,27 @@
 import os
 from PyPDF2 import PdfReader, PdfWriter
-from format_text import examinar_texto
+
+def proc_text(txt):
+    txt2 = txt.split(',')
+    ar = []
+    ar_format = []
+
+    for i in range(len(txt2)):
+        if len(txt2[i].split("-")) > 1:
+            ar_format.append("range")
+            ar.append([int(s) for s in txt2[i].split("-")])
+        elif len(txt2[i].split("+")) > 1:
+            ar_format.append("join")
+            ar.append(tuple([int(s) for s in txt2[i].split("+")]))
+        else:
+            ar_format.append("numeric")
+            ar.append(int(txt2[i]))
+
+    return ar
 
 def split_pages(input_path, output_folder, pages):
    
-    pages_to_extract = examinar_texto(pages)
-    print(pages_to_extract)
+    pages_to_extract = proc_text(pages)
     
     try:
         # Abre el archivo PDF de entrada con PdfReader
@@ -59,18 +75,5 @@ def split_pages(input_path, output_folder, pages):
             else:
                 print(f'Formato de página no válido, se omitirá: {page_range}')
 
-        print(f'Páginas del PDF divididas con éxito. Archivos guardados en: {output_folder}')
-
     except Exception as e:
         print(f'Error al dividir el PDF: {e}')
-
-
-
-#Ejemplo de uso
-
-hojas = '1,2,10+12,13-15,' # Lista de páginas a extraer
-input = 'book/book.pdf'  # Reemplaza con la ruta de tu archivo PDF de entrada
-output = 'book/probe'  # Reemplaza con la carpeta de salida que desees
-
-
-split_pages(input, output, hojas)
