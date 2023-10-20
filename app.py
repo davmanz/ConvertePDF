@@ -5,6 +5,7 @@ from flet import (
     app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
     ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio
 )
+from separate import split_pages
 
 class appbar_edit:
     def __init__(self) -> None:
@@ -52,6 +53,10 @@ def main(page: Page):
 
     def save_files_result(e: FilePickerResultEvent):
         text_converter_down.value = f"{e.path}.docx" if e.path else ""
+        text_converter_down.update()
+
+    def out_dir_result(e: FilePickerResultEvent):
+        text_converter_down.value = f"{e.path}" if e.path else ""
         text_converter_down.update()
 
     def verify_path(e):
@@ -108,9 +113,10 @@ def main(page: Page):
     # Instancia de objetos FilePicker
     pick_files_dialog = FilePicker(on_result=pick_files_result)
     save_file_dialog = FilePicker(on_result=save_files_result)
-
+    out_dir = FilePicker(on_result=out_dir_result)
+    
     # Agregar a la ventana y mantenerlos Oculto
-    page.overlay.extend([pick_files_dialog, save_file_dialog])
+    page.overlay.extend([pick_files_dialog, save_file_dialog, out_dir])
 
     # Componentes
     appbar_converter = AppBar(
@@ -144,6 +150,7 @@ def main(page: Page):
     )
 
     # FINAL CONVERSOR*********************************************************************************
+    
     # SEPARADOR---------------------------------------------------------------------------------------
 
     # Componentes
@@ -157,13 +164,20 @@ def main(page: Page):
 
     btn_separate = ElevatedButton(
         "Separar", icon=icons.BUILD_CIRCLE_SHARP,
-        disabled= True
+        disabled= True,
+        on_click= lambda _: separate()
     )
 
     radius_separate_page = RadioGroup(content= Column([Radio(value= 'all', label= 'Todo'),
                                                         Radio(value= 'parts', label= 'Partes')]),
                                                         on_change= lambda _:change_radius(),
-                                                        disabled= True)
+                                                        disabled= False)
+
+    btn_dir_down = ElevatedButton(
+        "Ruta Descarga",
+        icon=icons.ARROW_CIRCLE_DOWN,
+        on_click=lambda _: out_dir.get_directory_path()
+    )
 
     #Funciones
 
@@ -176,6 +190,12 @@ def main(page: Page):
             btn_separate.disabled = False
 
         page.update()
+
+    def separate():
+        pages_extract = text_separate_page.value
+        input = text_converter_up.value
+        output = text_converter_down.value
+        split_pages(input,output,pages_extract)
     
     # FINAL SEPARADOR***************************************************************************************
     # UNION---------------------------------------------------------------------------------------
@@ -223,7 +243,7 @@ def main(page: Page):
                         appbar_separate,
                         Column([
                             Row([text_converter_up, btn_converter_up], alignment= 'right'),
-                            Row([text_converter_down, btn_converter_down], alignment= 'right'),
+                            Row([text_converter_down, btn_dir_down]),
                             Row([radius_separate_page,text_separate_page , btn_separate], alignment= "right")
                         ])
                     ]

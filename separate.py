@@ -1,7 +1,12 @@
 import os
 from PyPDF2 import PdfReader, PdfWriter
+from format_text import examinar_texto
 
-def split_pdf_pages(input_path, output_folder, pages_to_extract):
+def split_pages(input_path, output_folder, pages):
+   
+    pages_to_extract = examinar_texto(pages)
+    print(pages_to_extract)
+    
     try:
         # Abre el archivo PDF de entrada con PdfReader
         pdf_reader = PdfReader(input_path)
@@ -10,6 +15,7 @@ def split_pdf_pages(input_path, output_folder, pages_to_extract):
         os.makedirs(output_folder, exist_ok=True)
 
         for page_range in pages_to_extract:
+
             if isinstance(page_range, int):
                 # Si se proporciona un número entero, extraer una página individual
                 page_num = page_range
@@ -23,7 +29,7 @@ def split_pdf_pages(input_path, output_folder, pages_to_extract):
                 else:
                     print(f'Página {page_num} fuera de rango, se omitirá.')
 
-            elif isinstance(page_range, tuple) and len(page_range) == 2:
+            elif isinstance(page_range, tuple):
                 # Si se proporciona una tupla con dos números, extraer un rango de páginas
                 start_page, end_page = page_range
                 if 0 < start_page <= end_page <= len(pdf_reader.pages):
@@ -58,8 +64,13 @@ def split_pdf_pages(input_path, output_folder, pages_to_extract):
     except Exception as e:
         print(f'Error al dividir el PDF: {e}')
 
-# Ejemplo de uso
-input_file = 'book/book.pdf'  # Reemplaza con la ruta de tu archivo PDF de entrada
-output_folder = 'book/probe'  # Reemplaza con la carpeta de salida que desees
-pages_to_extract = [3, (10,15), [20,25]]  # Lista de páginas a extraer
-split_pdf_pages(input_file, output_folder, pages_to_extract)
+
+
+#Ejemplo de uso
+
+hojas = '1,2,10+12,13-15,' # Lista de páginas a extraer
+input = 'book/book.pdf'  # Reemplaza con la ruta de tu archivo PDF de entrada
+output = 'book/probe'  # Reemplaza con la carpeta de salida que desees
+
+
+split_pages(input, output, hojas)
