@@ -20,6 +20,8 @@ def proc_text(txt):
     return ar
 
 def split_pages(input_path, output_folder, pages):
+
+    print(input_path)
    
     pages_to_extract = proc_text(pages)
     

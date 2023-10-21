@@ -1,10 +1,10 @@
 from time import sleep
 from pdf2docx import Converter
-from flet import (
-    app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
-    ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio
-)
+from flet import (app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
+                  ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio)
 from separate import split_pages
+import os
+from PyPDF2 import PdfReader
 
 class appbar_edit:
     def __init__(self) -> None:
@@ -45,8 +45,9 @@ def main(page: Page):
     # FUNCIONES DE EVENTO FilePickerResultEvent
     def pick_files_result(e: FilePickerResultEvent):
         text_converter_up.value = (
-            ", ".join(map(lambda f: f.path, e.files)) if e.files else None
-        )
+            ", ".join(map(lambda f: f.path, e.files)) if e.files else None)
+        global max_page
+        max_page = len(PdfReader(text_converter_up.value).pages)
         text_converter_up.update()
         page.update()
 
@@ -159,7 +160,12 @@ def main(page: Page):
         center_title=True
     )
 
-    text_separate_page = TextField(text_align="left", read_only=True, text_size=14, width=220)
+    text_separate_page = TextField(
+        text_align="left", 
+        read_only=True, 
+        text_size=14, 
+        width=220, 
+        on_change= lambda _:check_txt())
 
     btn_separate = ElevatedButton(
         "Separar", icon=icons.BUILD_CIRCLE_SHARP,
@@ -169,8 +175,9 @@ def main(page: Page):
 
     radius_separate_page = RadioGroup(content= Column([Radio(value= 'all', label= 'Todo'),
                                                         Radio(value= 'parts', label= 'Partes')]),
-                                                        on_change= lambda _:change_radius(),
-                                                        disabled= False)
+                                                        on_change= lambda _:change_radius(),                                                    
+                                                        disabled= False
+                                                        )
 
     btn_dir_down = ElevatedButton(
         "Ruta Descarga",
@@ -180,17 +187,74 @@ def main(page: Page):
 
     #Funciones
 
+    def check_txt():
+        content= text_separate_page.value
+        character_permit ='0123456789,+-'
+
+        if len(content) == 0:
+            return
+        
+        if content[0] in ',+-':
+            text_separate_page.value = ''
+            page.update()
+            return
+
+        if content[-1] not in character_permit:
+            text_separate_page.value = content[:len(content)-1]
+            page.update()
+        
+        if content[len(content)-2:len(content)] in [
+            '++','--',',,',
+            '+-','-+',',+',
+            '+,','-,',',-']:
+            text_separate_page.value = content[:len(content)-1]
+            page.update()
+
     def change_radius():
+
+        text_separate_page.label = f'Max: {str(max_page)}'
+
         if radius_separate_page.value == 'all':
             text_separate_page.read_only = True
             btn_separate.disabled = False
         if radius_separate_page.value == 'parts':
             text_separate_page.read_only = False
             btn_separate.disabled = False
-
         page.update()
-
+    
+    def objet_blank(obj):
+        obj.readonly = False
+        obj.value = ''
+        obj.readonly = True
+       
     def separate():
+
+        if text_converter_up.value == '' or text_converter_down.value == '':
+            objet_blank(text_converter_up)
+            objet_blank(text_converter_down)
+            objet_blank(text_separate_page)
+            page.update()
+            return
+
+        content= text_separate_page.value
+        
+        a = content.replace('+',',')
+        b = a.replace('-',',')
+        c = b.split(',')
+
+        for x in c:
+            if int(x) > max_page:
+                text_separate_page.value = ''
+                btn_separate.disabled = True
+                radius_separate_page.value = None
+                text_separate_page.read_only = True
+                page.update()
+                return
+            
+        if content[-1] in '-+,':
+            text_separate_page.value = content[:len(content)-1]
+            page.update()
+        
         pages_extract = text_separate_page.value
         input = text_converter_up.value
         output = text_converter_down.value
@@ -243,7 +307,7 @@ def main(page: Page):
                         Column([
                             Row([text_converter_up, btn_converter_up], alignment= 'right'),
                             Row([text_converter_down, btn_dir_down]),
-                            Row([radius_separate_page,text_separate_page , btn_separate], alignment= "right")
+                            Row([radius_separate_page,text_separate_page, btn_separate], alignment= "right")
                         ])
                     ]
                 )
