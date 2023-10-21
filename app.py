@@ -3,7 +3,6 @@ from pdf2docx import Converter
 from flet import (app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
                   ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio)
 from separate import split_pages
-import os
 from PyPDF2 import PdfReader
 
 class appbar_edit:
