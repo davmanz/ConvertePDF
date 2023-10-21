@@ -1,11 +1,16 @@
-max_page = 9
+'''
+import flet as ft
+from flet import Page, app
 
-txt = '8'
+def main(page:Page): 
+    Page.title = 'Example'
+    pr = ft.ProgressRing(width=50, height=50, stroke_width=5)
+    page.add(pr)
+app(main)
+'''
 
-a = txt.replace('+',',')
-b = a.replace('-',',')
-c = b.split(',')
+blb = {1,2,3}
 
-for x in c:
-    if int(x) > max_page:
-        print('STOP')
+fas = blb.add(5)
+
+print(blb)

@@ -1,19 +1,10 @@
 from time import sleep
 from pdf2docx import Converter
 from flet import (app, Page, Row, TextField, icons, ElevatedButton, FilePickerResultEvent, FilePicker,
-                  ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio)
+                  ProgressBar, Text, MainAxisAlignment, Column, AppBar, colors, View, RadioGroup, Radio,
+                  ProgressRing)
 from separate import split_pages
 from PyPDF2 import PdfReader
-
-class appbar_edit:
-    def __init__(self) -> None:
-        txt_variable = txt_variable
-        var = AppBar(
-            title=Text(txt_variable),
-            bgcolor=colors.SURFACE_VARIANT,
-            center_title=True
-        )
-        return var
 
 def main(page: Page):
     page.title = "PDF"
@@ -31,11 +22,11 @@ def main(page: Page):
 
     btn_init_converter= ElevatedButton("Conversor PDF", width=200, height=50, on_click= lambda _:page.go('/converter'))
 
-    btn_init_join= ElevatedButton("Unir PDF", width=200, height=50)
+    btn_init_join= ElevatedButton("Unir PDF", width=200, height=50, disabled= True)
 
     btn_init_separate= ElevatedButton("Separar PDF", width=200, height=50, on_click= lambda _:page.go('/separate'))
 
-    btn_init_edit= ElevatedButton("Editar PDF", width=200, height=50)
+    btn_init_edit= ElevatedButton("Editar PDF", width=200, height=50, disabled= True)
 
     # FIN INICIO***********************************************************************************************  
     
@@ -154,7 +145,7 @@ def main(page: Page):
 
     # Componentes
     appbar_separate = AppBar(
-        title=Text("Conversor PDF > DOCX"),
+        title=Text("Separacion de PDF"),
         bgcolor=colors.SURFACE_VARIANT,
         center_title=True
     )
@@ -184,7 +175,13 @@ def main(page: Page):
         on_click=lambda _: out_dir.get_directory_path()
     )
 
+    pr = ProgressRing(width=50, height=50, stroke_width=5, visible= False)
+
     #Funciones
+    def objet_blank(obj):
+        obj.readonly = False
+        obj.value = ''
+        obj.readonly = True
 
     def check_txt():
         content= text_separate_page.value
@@ -220,14 +217,9 @@ def main(page: Page):
             text_separate_page.read_only = False
             btn_separate.disabled = False
         page.update()
-    
-    def objet_blank(obj):
-        obj.readonly = False
-        obj.value = ''
-        obj.readonly = True
        
     def separate():
-
+        
         if text_converter_up.value == '' or text_converter_down.value == '':
             objet_blank(text_converter_up)
             objet_blank(text_converter_down)
@@ -257,8 +249,16 @@ def main(page: Page):
         pages_extract = text_separate_page.value
         input = text_converter_up.value
         output = text_converter_down.value
+        pr.visible = True
+        page.update()
         split_pages(input,output,pages_extract)
-    
+        pr.visible = False
+        appbar_separate.title = Text('Separacion EXITOSA', color='green')
+        page.update()
+        sleep(5)
+        appbar_separate.title = Text("Separacion de PDF")
+        page.update()
+
     # FINAL SEPARADOR***************************************************************************************
     # UNION---------------------------------------------------------------------------------------
 
@@ -306,7 +306,7 @@ def main(page: Page):
                         Column([
                             Row([text_converter_up, btn_converter_up], alignment= 'right'),
                             Row([text_converter_down, btn_dir_down]),
-                            Row([radius_separate_page,text_separate_page, btn_separate], alignment= "right")
+                            Row([radius_separate_page,text_separate_page, btn_separate, pr], alignment= "right")
                         ])
                     ]
                 )
