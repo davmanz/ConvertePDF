@@ -8,9 +8,8 @@ from PyPDF2 import PdfReader
 
 def main(page: Page):
     page.title = "PDF"
-    #page.vertical_alignment = "center"
     page.window_width = 550
-    page.window_height = 300
+    page.window_height = 250
     page.window_resizable= False
 
     # INICIO---------------------------------------------------------------------------------------------
@@ -208,16 +207,23 @@ def main(page: Page):
 
     def change_radius():
 
-        text_separate_page.label = f'Max: {str(max_page)}'
-
+        if text_converter_down.value == '' or text_converter_up.value == '':
+            radius_separate_page.value = ''
+            return
+        
         if radius_separate_page.value == 'all':
             text_separate_page.read_only = True
             btn_separate.disabled = False
+            text_separate_page.value = max_page
+
         if radius_separate_page.value == 'parts':
             text_separate_page.read_only = False
             btn_separate.disabled = False
+            text_separate_page.value = ''
+
+        text_separate_page.label = f'Max Pag: {str(max_page)}'
         page.update()
-       
+        
     def separate():
         
         if text_converter_up.value == '' or text_converter_down.value == '':
@@ -268,6 +274,8 @@ def main(page: Page):
     
     def cambio_ruta(e):
         page.views.clear()
+        page.window_width = 550
+        page.window_height = 250
 
         page.views.append(
             View(
@@ -283,6 +291,7 @@ def main(page: Page):
         )
         
         if page.route == '/converter':
+            page.window_height = 280   
             page.views.append(
                 View(
                     '/converter',
@@ -298,6 +307,7 @@ def main(page: Page):
             )
         
         if page.route == '/separate':
+            page.window_height = 300
             page.views.append(
                 View(
                     '/separate',
